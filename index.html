@@ -569,7 +569,7 @@ function renderDashboard(){
   c.innerHTML=`
     <div style="font-size:11px;color:var(--mu);letter-spacing:.06em;text-transform:uppercase;margin-bottom:16px">Balance temporada 2026</div>
 
-    <div class="card" style="margin-bottom:14px">
+    <div class="card" style="margin-bottom:10px">
       <div class="card-title">Resumen ACAB / UCAH</div>
       <table class="balance-table">
         <thead><tr><th></th><th class="acab">ACAB</th><th class="ucah">UCAH</th><th style="color:var(--mu)">Total</th></tr></thead>
@@ -582,13 +582,13 @@ function renderDashboard(){
           </tr>
           <tr>
             <td class="row-label">Adultos</td>
-            <td class="val-acab">${acab_a.length} <span class="pct">(${pct(acab_a.length,adultos)}% del total adultos)</span></td>
+            <td class="val-acab">${acab_a.length} <span class="pct">(${pct(acab_a.length,adultos)}% adultos)</span></td>
             <td class="val-ucah">${ucah_a.length} <span class="pct">(${pct(ucah_a.length,adultos)}%)</span></td>
             <td style="color:var(--mu)">${adultos}</td>
           </tr>
           <tr>
             <td class="row-label">Inferiores</td>
-            <td class="val-acab">${acab_i.length} <span class="pct">(${pct(acab_i.length,inferiores)}% del total inferiores)</span></td>
+            <td class="val-acab">${acab_i.length} <span class="pct">(${pct(acab_i.length,inferiores)}% inferiores)</span></td>
             <td class="val-ucah">${ucah_i.length} <span class="pct">(${pct(ucah_i.length,inferiores)}%)</span></td>
             <td style="color:var(--mu)">${inferiores}</td>
           </tr>
@@ -597,6 +597,12 @@ function renderDashboard(){
             <td class="val-acab">${km_a.toLocaleString('es-AR')} km <span class="pct">(${pct(km_a,km_tot)}%)</span></td>
             <td class="val-ucah">${km_u.toLocaleString('es-AR')} km <span class="pct">(${pct(km_u,km_tot)}%)</span></td>
             <td style="color:var(--mu)">${km_tot.toLocaleString('es-AR')} km</td>
+          </tr>
+          <tr>
+            <td class="row-label">Prom. partidos/árbitro <span style="font-size:10px;color:var(--mu)">(sin inf.)</span></td>
+            <td class="val-acab">${(()=>{const s=DESIGNACIONES.filter(d=>d.asociacion==='ACAB'&&!(d.categoria||'').toUpperCase().includes('INFANTIL'));const m={};s.forEach(d=>{[d.arbitro1,d.arbitro2].forEach(a=>{if(a)m[a]=(m[a]||0)+1;});});const tot=Object.values(m).reduce((x,v)=>x+v,0);const n=ARBITROS.filter(a=>a.asociacion==='ACAB').length||1;return (tot/n).toFixed(1);})()} </td>
+            <td class="val-ucah">${(()=>{const s=DESIGNACIONES.filter(d=>d.asociacion==='UCAH'&&!(d.categoria||'').toUpperCase().includes('INFANTIL'));const m={};s.forEach(d=>{[d.arbitro1,d.arbitro2].forEach(a=>{if(a)m[a]=(m[a]||0)+1;});});const tot=Object.values(m).reduce((x,v)=>x+v,0);const n=ARBITROS.filter(a=>a.asociacion==='UCAH').length||1;return (tot/n).toFixed(1);})()} </td>
+            <td style="color:var(--mu)">${(()=>{const s=DESIGNACIONES.filter(d=>!(d.categoria||'').toUpperCase().includes('INFANTIL'));const m={};s.forEach(d=>{[d.arbitro1,d.arbitro2].forEach(a=>{if(a)m[a]=(m[a]||0)+1;});});const tot=Object.values(m).reduce((x,v)=>x+v,0);const n=ARBITROS.length||1;return (tot/n).toFixed(1);})()} </td>
           </tr>
         </tbody>
       </table>
@@ -610,27 +616,26 @@ function renderDashboard(){
       </div>
     </div>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-      <div class="card" style="margin:0">
-        <div class="card-title">Balance por fecha</div>
-        ${fechasArr.map(([f,v])=>{const tot=v.ACAB+v.UCAH;return`
-          <div class="fecha-row">
-            <span class="fecha-num">Fecha ${f}</span>
-            <div class="fecha-bar"><div class="fb-a" style="width:${pct(v.ACAB,tot)}%"></div><div class="fb-u" style="width:${pct(v.UCAH,tot)}%"></div></div>
-            <span class="fecha-tot">${tot}p</span>
-          </div>`;}).join('')}
-      </div>
-      <div class="card" style="margin:0">
-        <div class="card-title">Métricas generales</div>
-        <div class="stat-row"><span class="stat-label">Árbitros activos</span><span class="stat-value">${ARBITROS.length}</span></div>
-        <div class="stat-row"><span class="stat-label">ACAB</span><span class="stat-value" style="color:var(--c)">${ARBITROS.filter(a=>a.asociacion==='ACAB').length} árbitros</span></div>
-        <div class="stat-row"><span class="stat-label">UCAH</span><span class="stat-value" style="color:var(--r-light)">${ARBITROS.filter(a=>a.asociacion==='UCAH').length} árbitros</span></div>
-        <div class="stat-row"><span class="stat-label">Fechas jugadas</span><span class="stat-value">${fechasArr.length}</span></div>
-        <div class="stat-row"><span class="stat-label">Partidos adultos</span><span class="stat-value">${adultos}</span></div>
-        <div class="stat-row"><span class="stat-label">Partidos inferiores</span><span class="stat-value">${inferiores}</span></div>
-        <div class="stat-row"><span class="stat-label">KM totales est.</span><span class="stat-value">${km_tot.toLocaleString('es-AR')} km</span></div>
-      </div>
-    </div>`;
+    ${(()=>{
+      function acDash(id,titulo,html){
+        return '<div style="border:1px solid var(--d5);border-radius:var(--rs);margin-bottom:8px;overflow:hidden">'
+          +'<div style="display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;background:var(--d4)" onclick="toggleHoja('dash-'+id+'')">'
+          +'<span style="font-size:13px;font-weight:600;color:var(--tx);flex:1">'+titulo+'</span>'
+          +'<span id="arrow-dash-'+id+'" style="color:var(--hi);font-size:12px;transition:transform .2s">▶</span>'
+          +'</div>'
+          +'<div id="hoja-body-dash-'+id+'" style="display:none;padding:14px">'+html+'</div>'
+          +'</div>';
+      }
+      const fechasHtml=fechasArr.map(([f,v])=>{const tot=v.ACAB+v.UCAH;return'<div class="fecha-row"><span class="fecha-num">Fecha '+f+'</span><div class="fecha-bar"><div class="fb-a" style="width:'+pct(v.ACAB,tot)+'%"></div><div class="fb-u" style="width:'+pct(v.UCAH,tot)+'%"></div></div><span class="fecha-tot">'+tot+'p</span></div>';}).join('');
+      const metHtml='<div class="stat-row"><span class="stat-label">Árbitros activos</span><span class="stat-value">'+ARBITROS.length+'</span></div>'
+        +'<div class="stat-row"><span class="stat-label">ACAB</span><span class="stat-value" style="color:var(--c)">'+ARBITROS.filter(a=>a.asociacion==='ACAB').length+' árbitros</span></div>'
+        +'<div class="stat-row"><span class="stat-label">UCAH</span><span class="stat-value" style="color:var(--r-light)">'+ARBITROS.filter(a=>a.asociacion==='UCAH').length+' árbitros</span></div>'
+        +'<div class="stat-row"><span class="stat-label">Fechas jugadas</span><span class="stat-value">'+fechasArr.length+'</span></div>'
+        +'<div class="stat-row"><span class="stat-label">Partidos adultos</span><span class="stat-value">'+adultos+'</span></div>'
+        +'<div class="stat-row"><span class="stat-label">Partidos inferiores</span><span class="stat-value">'+inferiores+'</span></div>'
+        +'<div class="stat-row"><span class="stat-label">KM totales est.</span><span class="stat-value">'+km_tot.toLocaleString('es-AR')+' km</span></div>';
+      return acDash('fechas','Balance por fecha',fechasHtml)+acDash('metricas','Métricas generales',metHtml);
+    })()}`;
 }
 
 // ── ÁRBITROS ─────────────────────────────────────────────
@@ -775,116 +780,115 @@ function renderEstadisticas(){
   DESIGNACIONES.forEach(d=>{const cat=(d.categoria||'').trim();if(cat)porCat[cat]=(porCat[cat]||0)+1;});
   const cats=Object.entries(porCat).sort((a,b)=>b[1]-a[1]);
   c.innerHTML=`
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
-      <div class="card" style="margin:0">
-        <div class="card-title">Partidos por categoría</div>
-        ${cats.map(([cat,n])=>`
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-            <span style="font-size:12px;color:var(--mu);flex:1">${cat}</span>
-            <div style="width:80px;height:4px;background:var(--d5);border-radius:2px;overflow:hidden">
-              <div style="height:100%;background:var(--c);width:${n/total*100}%"></div>
-            </div>
-            <span style="font-size:12px;font-weight:500;min-width:28px;text-align:right">${n}</span>
-          </div>`).join('')}
+    ${(()=>{
+      function aE(id,tit,html){
+        return '<div style="border:1px solid var(--d5);border-radius:var(--rs);margin-bottom:8px;overflow:hidden">'
+          +'<div style="display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;background:var(--d4)" onclick="toggleHoja(\'e-'+id+'\')"> '
+          +'<span style="font-size:13px;font-weight:600;color:var(--tx);flex:1">'+tit+'</span>'
+          +'<span id="arrow-e-'+id+'" style="color:var(--hi);font-size:12px;transition:transform .2s">▶</span>'
+          +'</div>'
+          +'<div id="hoja-body-e-'+id+'" style="display:none;padding:14px">'+html+'</div>'
+          +'</div>';
+      }
+      const catHtml=cats.map(([cat,n])=>'<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-size:12px;color:var(--mu);flex:1">'+cat+'</span><div style="width:80px;height:4px;background:var(--d5);border-radius:2px;overflow:hidden"><div style="height:100%;background:var(--c);width:'+(n/total*100)+'%"></div></div><span style="font-size:12px;font-weight:500;min-width:28px;text-align:right">'+n+'</span></div>').join('');
+      const topHtml=topArb.slice(0,8).map(([nombre,n],i)=>{const arb=ARBITROS.find(a=>normNombre(a.nombre).includes(normNombre(nombre).split(' ')[0]));const km=getKmArbitro(nombre);return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px"><span style="font-size:11px;color:var(--hi);min-width:16px">'+(i+1)+'</span><span style="font-size:13px;flex:1;color:var(--tx)">'+nombre+'</span><span style="font-size:11px;color:var(--mu)">'+km+'km</span><span style="font-size:13px;font-weight:600">'+n+'</span>'+(arb?'<span class="badge '+(arb.asociacion==='ACAB'?'badge-a':'badge-u')+'">'+arb.asociacion+'</span>':'')+'</div>';}).join('');
+      const rankHtml='<div style="overflow-x:auto"><table class="data-table"><thead><tr><th>#</th><th>Árbitro</th><th>Partidos</th><th>KM est.</th><th>Adultos</th><th>Inferiores</th><th>Asoc.</th></tr></thead><tbody>'+topArb.map(([nombre,n],i)=>{const arb=ARBITROS.find(a=>normNombre(a.nombre).includes(normNombre(nombre).split(' ')[0]));const pts=getPartidosArbitro(nombre);const km=getKmArbitro(nombre);const adt=pts.filter(d=>esAdulto(d.categoria)).length;return '<tr><td style="color:var(--hi)">'+(i+1)+'</td><td style="font-weight:500">'+nombre+'</td><td><strong>'+n+'</strong></td><td class="mono" style="color:var(--mu)">'+km+'km</td><td>'+adt+'</td><td>'+(pts.length-adt)+'</td><td>'+(arb?'<span class="badge '+(arb.asociacion==='ACAB'?'badge-a':'badge-u')+'">'+arb.asociacion+'</span>':'')+'</td></tr>';}).join('')+'</tbody></table></div>';
+      return aE('cats','Partidos por categoría',catHtml)
+        +aE('toparb','Top árbitros por partidos',topHtml);
+    })()}
+    <div style="border:1px solid var(--d5);border-radius:var(--rs);margin-bottom:8px;overflow:hidden">
+      <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;background:var(--d4)" onclick="toggleHoja('e-kmfechas')">
+        <span style="font-size:13px;font-weight:600;color:var(--tx);flex:1">Distribución de KM por fin de semana</span>
+        <span id="arrow-e-kmfechas" style="color:var(--hi);font-size:12px;transition:transform .2s">▶</span>
       </div>
-      <div class="card" style="margin:0">
-        <div class="card-title">Top árbitros por partidos</div>
-        ${topArb.slice(0,8).map(([nombre,n],i)=>{
-          const arb=ARBITROS.find(a=>normNombre(a.nombre).includes(normNombre(nombre).split(' ')[0]));
-          const km=getKmArbitro(nombre);
-          return`<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
-            <span style="font-size:11px;color:var(--hi);min-width:16px">${i+1}</span>
-            <span style="font-size:13px;flex:1;color:var(--tx)">${nombre}</span>
-            <span style="font-size:11px;color:var(--mu)">${km}km</span>
-            <span style="font-size:13px;font-weight:600">${n}</span>
-            ${arb?`<span class="badge ${arb.asociacion==='ACAB'?'badge-a':'badge-u'}">${arb.asociacion}</span>`:''}
-          </div>`;}).join('')}
-      </div>
-    </div>
-    <div class="card" style="margin-bottom:14px">
-      <div class="card-title">Distribución de KM por fin de semana</div>
-      <div id="hojas-acordeon">
-        ${(()=>{
-          const hojas={};
-          DESIGNACIONES.forEach(d=>{const h=d.hoja||'Sin fecha';if(!hojas[h])hojas[h]=[];hojas[h].push(d);});
-          const orden=['FECHA 1','REP1','FECHA 2','FECHA 3','FECHA 4','FECHA 5','FECHA 6','FECHA 7','F REC 2'];
-          const arr=orden.filter(h=>hojas[h]).concat(Object.keys(hojas).filter(h=>!orden.includes(h)&&hojas[h]));
-          return arr.map(h=>{
-            const partidos=hojas[h];
-            const acab=partidos.filter(d=>d.asociacion==='ACAB').length;
-            const ucah=partidos.filter(d=>d.asociacion==='UCAH').length;
-            const tot=partidos.length;
-            const vMap=new Map();
-            partidos.forEach(d=>{
-              [[d.arbitro1,d.km_arb1||0],[d.arbitro2,d.km_arb2||0]].forEach(([a,km])=>{
-                if(!a||km<=0)return;
-                const key=normNombre(a)+'|'+(d.hoja||'')+'|'+(d.fecha||'')+'|'+(d.cancha||'').toUpperCase();
-                if(!vMap.has(key))vMap.set(key,{km,asoc:d.asociacion});
+      <div id="hoja-body-e-kmfechas" style="display:none;padding:14px">
+        <div id="hojas-acordeon">
+          ${(()=>{
+            const hojas={};
+            DESIGNACIONES.forEach(d=>{const h=d.hoja||'Sin fecha';if(!hojas[h])hojas[h]=[];hojas[h].push(d);});
+            const orden=['FECHA 1','REP1','FECHA 2','FECHA 3','FECHA 4','FECHA 5','FECHA 6','FECHA 7','F REC 2'];
+            const arr=orden.filter(h=>hojas[h]).concat(Object.keys(hojas).filter(h=>!orden.includes(h)&&hojas[h]));
+            return arr.map(h=>{
+              const partidos=hojas[h];
+              const acab=partidos.filter(d=>d.asociacion==='ACAB').length;
+              const ucah=partidos.filter(d=>d.asociacion==='UCAH').length;
+              const tot=partidos.length;
+              const vMap=new Map();
+              partidos.forEach(d=>{
+                [[d.arbitro1,d.km_arb1||0],[d.arbitro2,d.km_arb2||0]].forEach(([a,km])=>{
+                  if(!a||km<=0)return;
+                  const key=normNombre(a)+'|'+(d.hoja||'')+'|'+(d.fecha||'')+'|'+(d.cancha||'').toUpperCase();
+                  if(!vMap.has(key))vMap.set(key,{km,asoc:d.asociacion});
+                });
               });
-            });
-            let kmH=0,kmHA=0,kmHU=0;
-            vMap.forEach(v=>{kmH+=v.km;if(v.asoc==='ACAB')kmHA+=v.km;else kmHU+=v.km;});
-            const hid=h.replace(/ /g,'-');
-            return '<div style="border:1px solid var(--d5);border-radius:var(--rs);margin-bottom:8px;overflow:hidden">'
-              +'<div style="display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;background:var(--d4)" onclick="toggleHoja(\''+hid+'\')">'
-              +'<span style="font-size:13px;font-weight:600;color:var(--tx);flex:1">'+h+'</span>'
-              +'<span style="font-size:12px;color:var(--mu)">'+tot+' partidos</span>'
-              +'<span style="font-size:11px;color:var(--c)">ACAB '+acab+' ('+pct(acab,tot)+'%)</span>'
-              +'<span style="font-size:11px;color:var(--r-light)">UCAH '+ucah+' ('+pct(ucah,tot)+'%)</span>'
-              +'<span style="font-size:11px;color:var(--mu)">'+kmH.toLocaleString('es-AR')+' km</span>'
-              +'<span style="font-size:11px;color:var(--c)">ACAB '+kmHA.toLocaleString('es-AR')+'km ('+pct(kmHA,kmH)+'%)</span>'
-              +'<span style="font-size:11px;color:var(--r-light)">UCAH '+kmHU.toLocaleString('es-AR')+'km ('+pct(kmHU,kmH)+'%)</span>'
-              +'<span id="arrow-'+hid+'" style="color:var(--hi);font-size:12px;transition:transform .2s">▶</span>'
-              +'</div>'
-              +'<div id="hoja-body-'+hid+'" style="display:none;padding:0 14px 12px">'
-              +'<div style="height:1px;background:var(--d5);margin-bottom:10px"></div>'
-              +'<div style="overflow-x:auto"><table class="data-table" style="font-size:12px">'
-              +'<thead><tr><th>F.Prog.</th><th>Fecha</th><th>Hora</th><th>Cancha</th><th>Categoría</th><th>Árbitro 1</th><th>Árbitro 2</th><th>Asoc.</th></tr></thead>'
-              +'<tbody>'+(function(){const _seen=new Set();return partidos.map(d=>{
-                const km1=d.km_arb1||0;
-                const km2=d.km_arb2||0;
-                const _k1=(d.arbitro1||'')+'|'+(d.dia||'')+'|'+(d.cancha||'');
-                const _k2=(d.arbitro2||'')+'|'+(d.dia||'')+'|'+(d.cancha||'');
-                const _s1=km1>0&&!_seen.has(_k1);if(_s1)_seen.add(_k1);
-                const _s2=km2>0&&!_seen.has(_k2);if(_s2)_seen.add(_k2);
-                const km1Show=_s1?km1+'km':'';
-                const km2Show=_s2?km2+'km':'';
-                return '<tr>'
-                  +'<td class="mono">'+d.fecha+'</td>'
-                  +'<td style="font-size:11px">'+d.dia+'</td>'
-                  +'<td class="mono">'+d.hora+'</td>'
-                  +'<td>'+d.cancha+'</td>'
-                  +'<td>'+d.categoria+'</td>'
-                  +'<td style="font-weight:500">'+d.arbitro1+(_s1?' <span class="mono" style="font-size:10px;color:var(--c)">'+km1Show+'</span>':'')+'</td>'
-                  +'<td style="color:var(--mu)">'+d.arbitro2+(_s2?' <span class="mono" style="font-size:10px;color:var(--c)">'+km2Show+'</span>':'')+'</td>'
-                  +'<td><span class="badge '+(d.asociacion==='ACAB'?'badge-a':'badge-u')+'">'+d.asociacion+'</span></td>'
-                  +'</tr>';
-              }).join('');})() 
-              +'</tbody></table></div></div></div>';
-          }).join('');
-        })()}
+              let kmH=0,kmHA=0,kmHU=0;
+              vMap.forEach(v=>{kmH+=v.km;if(v.asoc==='ACAB')kmHA+=v.km;else kmHU+=v.km;});
+              const hid=h.replace(/ /g,'-');
+              return '<div style="border:1px solid var(--d5);border-radius:var(--rs);margin-bottom:8px;overflow:hidden">'
+                +'<div style="display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;background:var(--d4)" onclick="toggleHoja(\''+hid+'\')"> '
+                +'<span style="font-size:13px;font-weight:600;color:var(--tx);flex:1">'+h+'</span>'
+                +'<span style="font-size:12px;color:var(--mu)">'+tot+' partidos</span>'
+                +'<span style="font-size:11px;color:var(--c)">ACAB '+acab+' ('+pct(acab,tot)+'%)</span>'
+                +'<span style="font-size:11px;color:var(--r-light)">UCAH '+ucah+' ('+pct(ucah,tot)+'%)</span>'
+                +'<span style="font-size:11px;color:var(--mu)">'+kmH.toLocaleString('es-AR')+' km</span>'
+                +'<span style="font-size:11px;color:var(--c)">ACAB '+kmHA.toLocaleString('es-AR')+'km ('+pct(kmHA,kmH)+'%)</span>'
+                +'<span style="font-size:11px;color:var(--r-light)">UCAH '+kmHU.toLocaleString('es-AR')+'km ('+pct(kmHU,kmH)+'%)</span>'
+                +'<span id="arrow-'+hid+'" style="color:var(--hi);font-size:12px;transition:transform .2s">▶</span>'
+                +'</div>'
+                +'<div id="hoja-body-'+hid+'" style="display:none;padding:0 14px 12px">'
+                +'<div style="height:1px;background:var(--d5);margin-bottom:10px"></div>'
+                +'<div style="overflow-x:auto"><table class="data-table" style="font-size:12px">'
+                +'<thead><tr><th>F.Prog.</th><th>Fecha</th><th>Hora</th><th>Cancha</th><th>Categoría</th><th>Árbitro 1</th><th>Árbitro 2</th><th>Asoc.</th></tr></thead>'
+                +'<tbody>'+(function(){const _seen=new Set();return partidos.map(d=>{
+                  const km1=d.km_arb1||0;
+                  const km2=d.km_arb2||0;
+                  const _k1=(d.arbitro1||'')+'|'+(d.dia||'')+'|'+(d.cancha||'');
+                  const _k2=(d.arbitro2||'')+'|'+(d.dia||'')+'|'+(d.cancha||'');
+                  const _s1=km1>0&&!_seen.has(_k1);if(_s1)_seen.add(_k1);
+                  const _s2=km2>0&&!_seen.has(_k2);if(_s2)_seen.add(_k2);
+                  const km1Show=_s1?km1+'km':'';
+                  const km2Show=_s2?km2+'km':'';
+                  return '<tr>'
+                    +'<td class="mono">'+d.fecha+'</td>'
+                    +'<td style="font-size:11px">'+d.dia+'</td>'
+                    +'<td class="mono">'+d.hora+'</td>'
+                    +'<td>'+d.cancha+'</td>'
+                    +'<td>'+d.categoria+'</td>'
+                    +'<td style="font-weight:500">'+d.arbitro1+(_s1?' <span class="mono" style="font-size:10px;color:var(--c)">'+km1Show+'</span>':'')+'</td>'
+                    +'<td style="color:var(--mu)">'+d.arbitro2+(_s2?' <span class="mono" style="font-size:10px;color:var(--c)">'+km2Show+'</span>':'')+'</td>'
+                    +'<td><span class="badge '+(d.asociacion==='ACAB'?'badge-a':'badge-u')+'">'+d.asociacion+'</span></td>'
+                    +'</tr>';
+                }).join('');})()
+                +'</tbody></table></div></div></div>';
+            }).join('');
+          })()}
+        </div>
       </div>
     </div>
-
-    <div class="card">
-      <div class="card-title">Ranking completo de árbitros</div>
-      <div style="overflow-x:auto"><table class="data-table">
-        <thead><tr><th>#</th><th>Árbitro</th><th>Partidos</th><th>KM est.</th><th>Adultos</th><th>Inferiores</th><th>Asoc.</th></tr></thead>
-        <tbody>${topArb.map(([nombre,n],i)=>{
-          const arb=ARBITROS.find(a=>normNombre(a.nombre).includes(normNombre(nombre).split(' ')[0]));
-          const pts=getPartidosArbitro(nombre);
-          const km=getKmArbitro(nombre);
-          const adt=pts.filter(d=>esAdulto(d.categoria)).length;
-          return`<tr>
-            <td style="color:var(--hi)">${i+1}</td>
-            <td style="font-weight:500">${nombre}</td>
-            <td><strong>${n}</strong></td>
-            <td class="mono" style="color:var(--mu)">${km}km</td>
-            <td>${adt}</td><td>${pts.length-adt}</td>
-            <td>${arb?`<span class="badge ${arb.asociacion==='ACAB'?'badge-a':'badge-u'}">${arb.asociacion}</span>`:''}</td>
-          </tr>`;}).join('')}
-        </tbody>
-      </table></div>
+    <div style="border:1px solid var(--d5);border-radius:var(--rs);margin-bottom:8px;overflow:hidden">
+      <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;background:var(--d4)" onclick="toggleHoja('e-ranking')">
+        <span style="font-size:13px;font-weight:600;color:var(--tx);flex:1">Ranking completo de árbitros</span>
+        <span id="arrow-e-ranking" style="color:var(--hi);font-size:12px;transition:transform .2s">▶</span>
+      </div>
+      <div id="hoja-body-e-ranking" style="display:none;padding:14px">
+        <div style="overflow-x:auto"><table class="data-table">
+          <thead><tr><th>#</th><th>Árbitro</th><th>Partidos</th><th>KM est.</th><th>Adultos</th><th>Inferiores</th><th>Asoc.</th></tr></thead>
+          <tbody>${topArb.map(([nombre,n],i)=>{
+            const arb=ARBITROS.find(a=>normNombre(a.nombre).includes(normNombre(nombre).split(' ')[0]));
+            const pts=getPartidosArbitro(nombre);
+            const km=getKmArbitro(nombre);
+            const adt=pts.filter(d=>esAdulto(d.categoria)).length;
+            return`<tr>
+              <td style="color:var(--hi)">${i+1}</td>
+              <td style="font-weight:500">${nombre}</td>
+              <td><strong>${n}</strong></td>
+              <td class="mono" style="color:var(--mu)">${km}km</td>
+              <td>${adt}</td><td>${pts.length-adt}</td>
+              <td>${arb?`<span class="badge ${arb.asociacion==='ACAB'?'badge-a':'badge-u'}">${arb.asociacion}</span>`:''}</td>
+            </tr>`;}).join('')}
+          </tbody>
+        </table></div>
+      </div>
     </div>`;
 }
 
