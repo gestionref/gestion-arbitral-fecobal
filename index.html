@@ -775,7 +775,7 @@ function renderEstadisticas(){
   const total=DESIGNACIONES.length;
   const porArb={};
   DESIGNACIONES.forEach(d=>{[d.arbitro1,d.arbitro2].forEach(a=>{if(a){const n=a.trim();porArb[n]=(porArb[n]||0)+1;}});});
-  const topArb=Object.entries(porArb).sort((a,b)=>b[1]-a[1]).slice(0,15);
+  const topArb=Object.entries(porArb).sort((a,b)=>b[1]-a[1]);
   const porCat={};
   DESIGNACIONES.forEach(d=>{const cat=(d.categoria||'').trim();if(cat)porCat[cat]=(porCat[cat]||0)+1;});
   const cats=Object.entries(porCat).sort((a,b)=>b[1]-a[1]);
