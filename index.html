@@ -619,7 +619,7 @@ function renderDashboard(){
     ${(()=>{
       function acDash(id,titulo,html){
         return '<div style="border:1px solid var(--d5);border-radius:var(--rs);margin-bottom:8px;overflow:hidden">'
-          +'<div style="display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;background:var(--d4)" onclick="toggleHoja('dash-'+id+'')">'
+          +'<div style="display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;background:var(--d4)" data-hoja="dash-'+id+'" onclick="toggleHoja(this.dataset.hoja)">'
           +'<span style="font-size:13px;font-weight:600;color:var(--tx);flex:1">'+titulo+'</span>'
           +'<span id="arrow-dash-'+id+'" style="color:var(--hi);font-size:12px;transition:transform .2s">▶</span>'
           +'</div>'
@@ -783,7 +783,7 @@ function renderEstadisticas(){
     ${(()=>{
       function aE(id,tit,html){
         return '<div style="border:1px solid var(--d5);border-radius:var(--rs);margin-bottom:8px;overflow:hidden">'
-          +'<div style="display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;background:var(--d4)" onclick="toggleHoja(\'e-'+id+'\')"> '
+          +'<div style="display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;background:var(--d4)" data-hoja="est-'+id+'" onclick="toggleHoja(this.dataset.hoja)">'
           +'<span style="font-size:13px;font-weight:600;color:var(--tx);flex:1">'+tit+'</span>'
           +'<span id="arrow-e-'+id+'" style="color:var(--hi);font-size:12px;transition:transform .2s">▶</span>'
           +'</div>'
@@ -797,7 +797,7 @@ function renderEstadisticas(){
         +aE('toparb','Top árbitros por partidos',topHtml);
     })()}
     <div style="border:1px solid var(--d5);border-radius:var(--rs);margin-bottom:8px;overflow:hidden">
-      <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;background:var(--d4)" onclick="toggleHoja('e-kmfechas')">
+      <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;background:var(--d4)" data-hoja="e-kmfechas" onclick="toggleHoja(this.dataset.hoja)">
         <span style="font-size:13px;font-weight:600;color:var(--tx);flex:1">Distribución de KM por fin de semana</span>
         <span id="arrow-e-kmfechas" style="color:var(--hi);font-size:12px;transition:transform .2s">▶</span>
       </div>
@@ -866,7 +866,7 @@ function renderEstadisticas(){
       </div>
     </div>
     <div style="border:1px solid var(--d5);border-radius:var(--rs);margin-bottom:8px;overflow:hidden">
-      <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;background:var(--d4)" onclick="toggleHoja('e-ranking')">
+      <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;background:var(--d4)" data-hoja="e-ranking" onclick="toggleHoja(this.dataset.hoja)">
         <span style="font-size:13px;font-weight:600;color:var(--tx);flex:1">Ranking completo de árbitros</span>
         <span id="arrow-e-ranking" style="color:var(--hi);font-size:12px;transition:transform .2s">▶</span>
       </div>
