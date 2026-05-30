@@ -525,8 +525,6 @@ function getCiudadCancha(cancha){
   if(CANCHA_CIUDAD[c.toUpperCase()]) return CANCHA_CIUDAD[c.toUpperCase()];
   return 'Córdoba Capital';
 }
-  return 'Córdoba Capital';
-}
 function getResidencia(nombre){
   const arb=ARBITROS.find(a=>normNombre(a.nombre)===normNombre(nombre));
   if(arb&&arb.residencia) return arb.residencia;
