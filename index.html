@@ -979,6 +979,15 @@ function renderEstadisticas(){
         </table></div>
 
     ${(()=>{
+      function aE(id,tit,html){
+        return '<div style="border:1px solid var(--d5);border-radius:var(--rs);margin-bottom:8px;overflow:hidden">'
+          +'<div style="display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;background:var(--d4)" data-hoja="'+id+'" onclick="toggleHoja(this.dataset.hoja)">'
+          +'<span style="font-size:13px;font-weight:600;color:var(--tx);flex:1">'+tit+'</span>'
+          +'<span id="arrow-'+id+'" style="color:var(--hi);font-size:12px;transition:transform .2s">▶</span>'
+          +'</div>'
+          +'<div id="hoja-body-'+id+'" style="display:none;padding:14px">'+html+'</div>'
+          +'</div>';
+      }
       // ── 4. PAREJAS DE ÁRBITROS MÁS FRECUENTES ──
       const parejas={};
       DESIGNACIONES.forEach(d=>{
