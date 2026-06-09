@@ -1111,9 +1111,62 @@ function renderEstadisticas(){
         +'<div class="bbar-labels"><span style="font-size:10px;color:var(--c)">FEM '+genPct(fem)+'%</span><span style="font-size:10px;color:var(--hi)">MASC '+genPct(masc)+'%</span></div>'
         +'</div>';
 
+      // ── DISTRIBUCIÓN POR CLUB ──
+      const INFANTIL_RE = /infantil/i;
+      const clubAsoc = {};
+      DESIGNACIONES.forEach(d => {
+        if (INFANTIL_RE.test(d.categoria || '')) return;
+        const asoc = (d.asociacion || '').toUpperCase();
+        if (asoc !== 'ACAB' && asoc !== 'UCAH') return;
+        [d.equipo_a, d.equipo_b].forEach(eq => {
+          if (!eq) return;
+          const n = eq.trim();
+          if (!clubAsoc[n]) clubAsoc[n] = { acab: 0, ucah: 0 };
+          if (asoc === 'ACAB') clubAsoc[n].acab++; else clubAsoc[n].ucah++;
+        });
+      });
+      const clubRows = Object.entries(clubAsoc)
+        .map(([c, v]) => ({ club: c, acab: v.acab, ucah: v.ucah, total: v.acab + v.ucah }))
+        .filter(r => r.total >= 5)
+        .sort((a, b) => b.total - a.total);
+      const totalPartidosAdultos = DESIGNACIONES.filter(d => !INFANTIL_RE.test(d.categoria || '') && ['ACAB','UCAH'].includes((d.asociacion||'').toUpperCase())).length;
+      const acabTotal = DESIGNACIONES.filter(d => !INFANTIL_RE.test(d.categoria||'') && (d.asociacion||'').toUpperCase()==='ACAB').length;
+      const ucahTotal = DESIGNACIONES.filter(d => !INFANTIL_RE.test(d.categoria||'') && (d.asociacion||'').toUpperCase()==='UCAH').length;
+      const distClubHtml =
+        '<div style="margin-bottom:14px">'
+        + '<div style="display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap">'
+        + '<div style="flex:1;min-width:100px;background:var(--d4);border-radius:var(--rs);padding:10px 14px;text-align:center"><div style="font-size:22px;font-weight:700;color:var(--tx)">' + totalPartidosAdultos + '</div><div style="font-size:11px;color:var(--mu)">Partidos (sin infantil)</div></div>'
+        + '<div style="flex:1;min-width:100px;background:var(--d4);border-radius:var(--rs);padding:10px 14px;text-align:center"><div style="font-size:22px;font-weight:700;color:var(--c)">' + acabTotal + ' <span style="font-size:13px;font-weight:400">(' + (totalPartidosAdultos ? Math.round(acabTotal/totalPartidosAdultos*100) : 0) + '%)</span></div><div style="font-size:11px;color:var(--mu)">ACAB</div></div>'
+        + '<div style="flex:1;min-width:100px;background:var(--d4);border-radius:var(--rs);padding:10px 14px;text-align:center"><div style="font-size:22px;font-weight:700;color:var(--r-light)">' + ucahTotal + ' <span style="font-size:13px;font-weight:400">(' + (totalPartidosAdultos ? Math.round(ucahTotal/totalPartidosAdultos*100) : 0) + '%)</span></div><div style="font-size:11px;color:var(--mu)">UCAH</div></div>'
+        + '</div>'
+        + '<div style="overflow-x:auto"><table class="data-table" style="font-size:12px">'
+        + '<thead><tr><th>#</th><th>Club / Equipo</th><th style="text-align:right">ACAB</th><th style="text-align:right">UCAH</th><th style="text-align:right">Total</th><th style="min-width:120px">Distribución</th><th style="text-align:right">% ACAB</th><th style="text-align:right">% UCAH</th></tr></thead>'
+        + '<tbody>'
+        + clubRows.map((r, i) => {
+            const pctA = Math.round(r.acab / r.total * 100);
+            const pctU = 100 - pctA;
+            return '<tr>'
+              + '<td style="color:var(--hi)">' + (i+1) + '</td>'
+              + '<td style="font-weight:500">' + r.club + '</td>'
+              + '<td style="text-align:right;color:var(--c)">' + r.acab + '</td>'
+              + '<td style="text-align:right;color:var(--r-light)">' + r.ucah + '</td>'
+              + '<td style="text-align:right;font-weight:600">' + r.total + '</td>'
+              + '<td><div style="display:flex;height:8px;border-radius:4px;overflow:hidden;min-width:100px">'
+              +   '<div style="background:var(--c);width:' + pctA + '%"></div>'
+              +   '<div style="background:var(--r-light);width:' + pctU + '%"></div>'
+              + '</div></td>'
+              + '<td style="text-align:right;font-weight:600;color:var(--c)">' + pctA + '%</td>'
+              + '<td style="text-align:right;color:var(--r-light)">' + pctU + '%</td>'
+              + '</tr>';
+          }).join('')
+        + '</tbody></table></div>'
+        + '<div style="margin-top:8px;font-size:11px;color:var(--mu)">Solo incluye equipos con 5 o más partidos designados. Excluye categorías Infantil.</div>'
+        + '</div>';
+
       return aE('parejas','Parejas de árbitros más frecuentes',parejasHtml)
         +aE('cargadia','Máxima carga por día',cargaHtml)
         +aE('kmprom','Promedio KM por partido',kmPromHtml)
+        +aE('distclub','Distribución ACAB/UCAH por club',distClubHtml)
         +aE('sedes','Ranking de sedes',sedesHtml)
         +aE('aranceles','Total aranceles',arancelHtml)
         +aE('viaticos','Viáticos por club',viatHtml)
