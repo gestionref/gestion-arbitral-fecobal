@@ -219,11 +219,13 @@ select option{background:var(--d3)}
       <div class="s-item active" onclick="switchSidebar('tab-arb-perfil',this)"><div class="s-indicator"></div><div class="s-dot"></div><span>Mi perfil</span></div>
       <div class="s-item" onclick="switchSidebar('tab-arb-partidos',this)"><div class="s-indicator"></div><div class="s-dot"></div><span>Mis partidos</span></div>
       <div class="s-item" onclick="switchSidebar('tab-arb-stats',this)"><div class="s-indicator"></div><div class="s-dot"></div><span>Estadísticas</span></div>
+      <div class="s-item" onclick="switchSidebar('tab-arb-examenes',this)"><div class="s-indicator"></div><div class="s-dot"></div><span>Exámenes</span></div>
     </div>
     <div class="main">
       <div id="tab-arb-perfil" class="tab-content"></div>
       <div id="tab-arb-partidos" class="tab-content" style="display:none"></div>
       <div id="tab-arb-stats" class="tab-content" style="display:none"></div>
+      <div id="tab-arb-examenes" class="tab-content" style="display:none"></div>
     </div>
   </div>
 </div>
@@ -607,6 +609,7 @@ function switchSidebar(tabId,el){
   else if(tabId==='tab-arb-perfil') renderArbPerfil();
   else if(tabId==='tab-arb-partidos') renderArbPartidos();
   else if(tabId==='tab-arb-stats') renderArbStats();
+  else if(tabId==='tab-arb-examenes') renderArbExamenes();
 }
 
 function doLogin(){
@@ -1273,6 +1276,16 @@ function renderArbStats(){
           </div>
           <span style="font-size:13px;font-weight:600;min-width:24px;text-align:right">${n}</span>
         </div>`).join('')}
+    </div>`;
+}
+
+function renderArbExamenes(){
+  if(!currentUser||currentUser.tipo!=='arbitro')return;
+  const a=currentUser;
+  const examUrl='https://gestionref.github.io/examenesref/?arb_id='+encodeURIComponent(a.id)+'&nombre='+encodeURIComponent(a.nombre)+'&asociacion='+encodeURIComponent(a.asociacion||'');
+  document.getElementById('tab-arb-examenes').innerHTML=`
+    <div class="card" style="margin:0;padding:0;overflow:hidden;height:calc(100vh - 110px)">
+      <iframe src="${examUrl}" style="width:100%;height:100%;border:none;display:block" title="Exámenes FeCoBal"></iframe>
     </div>`;
 }
 
